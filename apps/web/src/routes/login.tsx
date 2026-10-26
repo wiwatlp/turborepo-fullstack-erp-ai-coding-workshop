@@ -1,3 +1,4 @@
+import type { Role } from '@erp/contracts';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Navigate, useSearchParams } from 'react-router';
@@ -6,12 +7,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { isUnauthorized, safeRedirect, useSession } from '@/lib/auth';
+import { formatStoreAssignment, I18N, ROLE_LABELS_TH } from '@/lib/i18n';
 import { orpc } from '@/lib/orpc';
 
 // Created by packages/database/prisma/seed.ts.
-const demoAccounts = [
-  { email: 'admin@erp.local', role: 'ADMIN' },
-  { email: 'staff@erp.local', role: 'STAFF' },
+const demoAccounts: Array<{ email: string; role: Role; storeId?: string | null }> = [
+  { email: 'admin@erp.local', role: 'ADMIN', storeId: null },
+  { email: 'buyer01@erp.local', role: 'PURCHASING', storeId: null },
+  { email: 'manager01@erp.local', role: 'MANAGER', storeId: null },
+  { email: 'staff_b01@erp.local', role: 'STORE_STAFF', storeId: 'B01' },
+  { email: 'staff@erp.local', role: 'STORE_STAFF', storeId: 'B01' },
 ];
 const DEMO_PASSWORD = 'password';
 
@@ -36,8 +41,8 @@ export function LoginPage() {
     <div className="flex min-h-svh items-center justify-center bg-muted p-6">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-xl">ERP Workshop</CardTitle>
-          <CardDescription>Sign in to continue</CardDescription>
+          <CardTitle className="text-xl">{I18N.appTitle}</CardTitle>
+          <CardDescription>Sign in to continue / {I18N.signInPrompt}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <form
@@ -72,8 +77,8 @@ export function LoginPage() {
             {login.error && (
               <p role="alert" className="text-sm text-destructive">
                 {isUnauthorized(login.error)
-                  ? 'Invalid email or password.'
-                  : 'Could not sign in. Is the API running?'}
+                  ? `${I18N.invalidCredentials} (Invalid email or password.)`
+                  : `${I18N.networkError} (Could not sign in. Is the API running?)`}
               </p>
             )}
             <Button type="submit" className="w-full" disabled={login.isPending}>
@@ -94,7 +99,9 @@ export function LoginPage() {
                 }}
               >
                 <span>{account.email}</span>
-                <span>{account.role}</span>
+                <span className="text-xs">
+                  {ROLE_LABELS_TH[account.role]} {account.storeId ? `(${account.storeId})` : ''}
+                </span>
               </button>
             ))}
           </div>

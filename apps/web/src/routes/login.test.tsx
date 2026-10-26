@@ -6,7 +6,7 @@ import { createQueryClient } from '@/lib/query-client';
 import { mockApi, unauthorized } from '@/test/mock-api';
 import { LoginPage } from './login';
 
-const admin = { id: '1', email: 'admin@erp.local', name: 'Admin User', role: 'ADMIN' };
+const admin = { id: '1', email: 'admin@erp.local', name: 'Admin User', role: 'ADMIN', storeId: null };
 
 function renderLogin(url = '/login') {
   const router = createMemoryRouter(
@@ -25,8 +25,8 @@ function renderLogin(url = '/login') {
 }
 
 async function signIn(email: string, password: string) {
-  fireEvent.change(await screen.findByLabelText('Email'), { target: { value: email } });
-  fireEvent.change(screen.getByLabelText('Password'), { target: { value: password } });
+  fireEvent.change(await screen.findByLabelText(/Email/i), { target: { value: email } });
+  fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: password } });
   fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
 }
 
