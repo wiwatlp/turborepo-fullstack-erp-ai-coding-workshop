@@ -42,7 +42,7 @@ export function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-xl">{I18N.appTitle}</CardTitle>
-          <CardDescription>Sign in to continue / {I18N.signInPrompt}</CardDescription>
+          <CardDescription>{I18N.signInPrompt}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <form
@@ -76,18 +76,16 @@ export function LoginPage() {
             </div>
             {login.error && (
               <p role="alert" className="text-sm text-destructive">
-                {isUnauthorized(login.error)
-                  ? `${I18N.invalidCredentials} (Invalid email or password.)`
-                  : `${I18N.networkError} (Could not sign in. Is the API running?)`}
+                {isUnauthorized(login.error) ? I18N.invalidCredentials : I18N.networkError}
               </p>
             )}
             <Button type="submit" className="w-full" disabled={login.isPending}>
-              {login.isPending ? 'Signing in…' : 'Sign in'}
+              {login.isPending ? I18N.signingIn : I18N.signIn}
             </Button>
           </form>
 
           <div className="space-y-2 rounded-md border bg-muted/50 p-3 text-sm">
-            <p className="font-medium">Demo accounts (password: {DEMO_PASSWORD})</p>
+            <p className="font-medium">{I18N.demoAccountsTitle}</p>
             {demoAccounts.map((account) => (
               <button
                 key={account.email}

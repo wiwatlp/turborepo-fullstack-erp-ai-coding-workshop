@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createQueryClient } from '@/lib/query-client';
+import { I18N } from '@/lib/i18n';
 import { mockApi, unauthorized } from '@/test/mock-api';
 import { LoginPage } from './login';
 
@@ -33,7 +34,7 @@ function renderLogin(url = '/login') {
 async function signIn(email: string, password: string) {
   fireEvent.change(await screen.findByLabelText(/Email/i), { target: { value: email } });
   fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: password } });
-  fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(`${I18N.signIn}|Sign in`, 'i') }));
 }
 
 describe('LoginPage', () => {
@@ -61,7 +62,7 @@ describe('LoginPage', () => {
     renderLogin();
     await signIn('admin@erp.local', 'wrong');
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Invalid email or password.');
+    expect(await screen.findByRole('alert')).toHaveTextContent(I18N.invalidCredentials);
   });
 
   it('fills in a demo account', async () => {
