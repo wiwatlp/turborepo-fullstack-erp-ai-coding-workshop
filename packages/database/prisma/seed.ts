@@ -27,7 +27,12 @@ async function main() {
 
   const demoUsers = [
     { email: 'admin@erp.local', name: 'Admin User', role: Role.ADMIN, storeId: null },
-    { email: 'buyer01@erp.local', name: 'Purchasing Officer', role: Role.PURCHASING, storeId: null },
+    {
+      email: 'buyer01@erp.local',
+      name: 'Purchasing Officer',
+      role: Role.PURCHASING,
+      storeId: null,
+    },
     { email: 'manager01@erp.local', name: 'Manager User', role: Role.MANAGER, storeId: null },
     {
       email: 'staff_b01@erp.local',
@@ -57,7 +62,9 @@ async function main() {
       create: { ...user, passwordHash },
     });
   }
-  console.log(`Seeded ${demoStores.length} stores and ${demoUsers.length} demo users (password: "${DEMO_PASSWORD}").`);
+  console.log(
+    `Seeded ${demoStores.length} stores and ${demoUsers.length} demo users (password: "${DEMO_PASSWORD}").`,
+  );
 }
 
 try {

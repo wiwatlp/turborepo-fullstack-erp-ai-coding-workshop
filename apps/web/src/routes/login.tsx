@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { isUnauthorized, safeRedirect, useSession } from '@/lib/auth';
-import { formatStoreAssignment, I18N, ROLE_LABELS_TH } from '@/lib/i18n';
+import { I18N, ROLE_LABELS_TH } from '@/lib/i18n';
 import { orpc } from '@/lib/orpc';
 
 // Created by packages/database/prisma/seed.ts.

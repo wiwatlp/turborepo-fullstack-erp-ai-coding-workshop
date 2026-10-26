@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { type ExecutionContext, Controller, Get, Param, Query } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { Test, type TestingModule } from '@nestjs/testing';
@@ -9,7 +9,7 @@ import type { Response } from 'express';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { PrismaService } from '../database/prisma.service.js';
 import { AuthController } from './auth.controller.js';
-import { CurrentUser, Public, Roles } from './auth.decorators.js';
+import { Public, Roles } from './auth.decorators.js';
 import { AuthGuard } from './auth.guard.js';
 import { SESSION_COOKIE, verifySessionToken } from './session-token.js';
 
@@ -84,11 +84,13 @@ describe('Auth & Store-Scoped Access Integration', () => {
           provide: PrismaService,
           useValue: {
             user: {
-              findUnique: vi.fn().mockImplementation(({ where }: { where: { email?: string; id?: string } }) => {
-                if (where.email) return users[where.email] ?? null;
-                if (where.id) return Object.values(users).find((u) => u.id === where.id) ?? null;
-                return null;
-              }),
+              findUnique: vi
+                .fn()
+                .mockImplementation(({ where }: { where: { email?: string; id?: string } }) => {
+                  if (where.email) return users[where.email] ?? null;
+                  if (where.id) return Object.values(users).find((u) => u.id === where.id) ?? null;
+                  return null;
+                }),
             },
           },
         },
@@ -122,7 +124,11 @@ describe('Auth & Store-Scoped Access Integration', () => {
       get cookieHeader() {
         return `${cookieName}=${cookieVal}`;
       },
-    } as unknown as Response & { cookie: ReturnType<typeof vi.fn>; clearCookie: ReturnType<typeof vi.fn>; cookieHeader: string };
+    } as unknown as Response & {
+      cookie: ReturnType<typeof vi.fn>;
+      clearCookie: ReturnType<typeof vi.fn>;
+      cookieHeader: string;
+    };
   }
 
   it('valid login issues session token and returns user details with storeId', async () => {
@@ -172,12 +178,15 @@ describe('Auth & Store-Scoped Access Integration', () => {
       }),
       getHandler: () => TestResourceController.prototype.adminOnly,
       getClass: () => TestResourceController,
-    } as any;
+    } as unknown as ExecutionContext;
 
     await expect(guard.canActivate(adminContext)).resolves.toBe(true);
 
     const resStaff = fakeResponse();
-    await call(authController.login(resStaff), { email: 'staff_b01@erp.local', password: 'password' });
+    await call(authController.login(resStaff), {
+      email: 'staff_b01@erp.local',
+      password: 'password',
+    });
 
     const staffContext = {
       switchToHttp: () => ({
@@ -189,14 +198,17 @@ describe('Auth & Store-Scoped Access Integration', () => {
       }),
       getHandler: () => TestResourceController.prototype.adminOnly,
       getClass: () => TestResourceController,
-    } as any;
+    } as unknown as ExecutionContext;
 
     await expect(guard.canActivate(staffContext)).rejects.toThrow();
   });
 
   it('verifies store-scoping: staff_b01 can access B01 but is rejected with 403 on B02 (NFR-01, AC-04)', async () => {
     const resStaff = fakeResponse();
-    await call(authController.login(resStaff), { email: 'staff_b01@erp.local', password: 'password' });
+    await call(authController.login(resStaff), {
+      email: 'staff_b01@erp.local',
+      password: 'password',
+    });
 
     // Access assigned store B01 -> Allowed
     const allowedContext = {
@@ -209,7 +221,7 @@ describe('Auth & Store-Scoped Access Integration', () => {
       }),
       getHandler: () => TestResourceController.prototype.storeScopedStaff,
       getClass: () => TestResourceController,
-    } as any;
+    } as unknown as ExecutionContext;
 
     await expect(guard.canActivate(allowedContext)).resolves.toBe(true);
 
@@ -224,7 +236,7 @@ describe('Auth & Store-Scoped Access Integration', () => {
       }),
       getHandler: () => TestResourceController.prototype.storeScopedStaff,
       getClass: () => TestResourceController,
-    } as any;
+    } as unknown as ExecutionContext;
 
     await expect(guard.canActivate(rejectedContext)).rejects.toThrow();
   });

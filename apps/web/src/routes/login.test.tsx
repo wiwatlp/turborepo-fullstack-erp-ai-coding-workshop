@@ -6,7 +6,13 @@ import { createQueryClient } from '@/lib/query-client';
 import { mockApi, unauthorized } from '@/test/mock-api';
 import { LoginPage } from './login';
 
-const admin = { id: '1', email: 'admin@erp.local', name: 'Admin User', role: 'ADMIN', storeId: null };
+const admin = {
+  id: '1',
+  email: 'admin@erp.local',
+  name: 'Admin User',
+  role: 'ADMIN',
+  storeId: null,
+};
 
 function renderLogin(url = '/login') {
   const router = createMemoryRouter(

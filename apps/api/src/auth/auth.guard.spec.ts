@@ -10,10 +10,34 @@ import { AuthGuard } from './auth.guard.js';
 import { createSessionToken, SESSION_COOKIE } from './session-token.js';
 
 const secret = 'test-secret-that-is-at-least-32-characters';
-const staff: User = { id: 'u1', email: 'staff@erp.local', name: 'Staff User', role: 'STORE_STAFF', storeId: 'store-b01' };
-const buyer: User = { id: 'u2', email: 'buyer@erp.local', name: 'Buyer User', role: 'PURCHASING', storeId: null };
-const manager: User = { id: 'u3', email: 'manager@erp.local', name: 'Manager User', role: 'MANAGER', storeId: null };
-const admin: User = { id: 'u4', email: 'admin@erp.local', name: 'Admin User', role: 'ADMIN', storeId: null };
+const staff: User = {
+  id: 'u1',
+  email: 'staff@erp.local',
+  name: 'Staff User',
+  role: 'STORE_STAFF',
+  storeId: 'store-b01',
+};
+const buyer: User = {
+  id: 'u2',
+  email: 'buyer@erp.local',
+  name: 'Buyer User',
+  role: 'PURCHASING',
+  storeId: null,
+};
+const manager: User = {
+  id: 'u3',
+  email: 'manager@erp.local',
+  name: 'Manager User',
+  role: 'MANAGER',
+  storeId: null,
+};
+const admin: User = {
+  id: 'u4',
+  email: 'admin@erp.local',
+  name: 'Admin User',
+  role: 'ADMIN',
+  storeId: null,
+};
 
 class RoutesUnderTest {
   @Public()
@@ -127,9 +151,9 @@ describe('AuthGuard', () => {
     await expect(runManager('purchasingOrManager', sessionCookie('u3')).result).resolves.toBe(true);
 
     const { run: runStaff } = setup(staff);
-    await expect(runStaff('purchasingOrManager', sessionCookie('u1')).result).rejects.toBeInstanceOf(
-      ForbiddenException,
-    );
+    await expect(
+      runStaff('purchasingOrManager', sessionCookie('u1')).result,
+    ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it('rejects STORE_STAFF missing an assigned storeId', async () => {
@@ -181,7 +205,8 @@ describe('AuthGuard', () => {
 
     const { run: runManager } = setup(manager);
     await expect(
-      runManager('closed', { cookie: sessionCookie('u3'), params: { storeId: 'store-b02' } }).result,
+      runManager('closed', { cookie: sessionCookie('u3'), params: { storeId: 'store-b02' } })
+        .result,
     ).resolves.toBe(true);
 
     const { run: runBuyer } = setup(buyer);
