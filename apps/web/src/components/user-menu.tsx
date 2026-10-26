@@ -3,6 +3,7 @@ import { LogOut } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { clearSession, useCurrentUser } from '@/lib/auth';
+import { formatStoreAssignment, I18N, ROLE_LABELS_TH } from '@/lib/i18n';
 import { orpc } from '@/lib/orpc';
 
 export function UserMenu() {
@@ -16,16 +17,19 @@ export function UserMenu() {
 
   return (
     <div className="flex items-center gap-3 text-sm font-normal">
-      <span>{user.name}</span>
-      <Badge variant="secondary">{user.role}</Badge>
+      <span className="font-medium">{user.name}</span>
+      <Badge variant="secondary">{ROLE_LABELS_TH[user.role] ?? user.role}</Badge>
+      <span className="text-xs text-muted-foreground" data-testid="user-store">
+        {formatStoreAssignment(user.storeId)}
+      </span>
       <Button
         variant="ghost"
         size="sm"
         onClick={() => logout.mutate({})}
         disabled={logout.isPending}
       >
-        <LogOut />
-        Log out
+        <LogOut className="h-4 w-4 mr-1" />
+        {I18N.signOut}
       </Button>
     </div>
   );

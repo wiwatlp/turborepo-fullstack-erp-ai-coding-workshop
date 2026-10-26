@@ -1,16 +1,34 @@
 import { oc } from '@orpc/contract';
 import * as z from 'zod';
 
-export const RoleSchema = z.enum(['ADMIN', 'STAFF']);
+export const RoleSchema = z.enum(['ADMIN', 'PURCHASING', 'STORE_STAFF', 'MANAGER']);
 export type Role = z.infer<typeof RoleSchema>;
 
 /** The signed-in user as the API exposes it (never includes the password hash). */
-export const UserSchema = z.object({
-  id: z.string(),
-  email: z.email(),
-  name: z.string(),
-  role: RoleSchema,
-});
+export const UserSchema = z
+  .object({
+    id: z.string(),
+    email: z.email(),
+    name: z.string(),
+    role: RoleSchema,
+    storeId: z.string().nullable(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.role === 'STORE_STAFF' && !val.storeId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'storeId is mandatory for STORE_STAFF',
+        path: ['storeId'],
+      });
+    }
+    if (val.role !== 'STORE_STAFF' && val.storeId !== null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'storeId must be null for organization-wide roles',
+        path: ['storeId'],
+      });
+    }
+  });
 export type User = z.infer<typeof UserSchema>;
 
 export const LoginInputSchema = z.object({
