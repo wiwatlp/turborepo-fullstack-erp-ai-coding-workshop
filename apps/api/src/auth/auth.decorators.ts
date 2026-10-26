@@ -4,12 +4,16 @@ import type { Request } from 'express';
 
 export const IS_PUBLIC_KEY = 'auth:isPublic';
 export const ROLES_KEY = 'auth:roles';
+export const STORE_SCOPED_KEY = 'auth:storeScoped';
 
 /** Every route requires a signed-in user unless it (or its controller) is marked `@Public()`. */
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 
 /** Only users with one of these roles may call the route, e.g. `@Roles('ADMIN')`. */
 export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
+
+/** Marks a route or controller as store-scoped. STORE_STAFF can only access their assigned store. */
+export const StoreScoped = () => SetMetadata(STORE_SCOPED_KEY, true);
 
 /** The request after `AuthGuard` has run. `user` is unset on public routes without a session. */
 export type AuthenticatedRequest = Request & { user?: User };

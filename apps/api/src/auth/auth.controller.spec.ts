@@ -10,7 +10,8 @@ import { AuthController } from './auth.controller.js';
 import { SESSION_COOKIE, verifySessionToken } from './session-token.js';
 
 const secret = 'test-secret-that-is-at-least-32-characters';
-const admin: User = { id: 'u1', email: 'admin@erp.local', name: 'Admin User', role: 'ADMIN' };
+const admin: User = { id: 'u1', email: 'admin@erp.local', name: 'Admin User', role: 'ADMIN', storeId: null };
+const staff: User = { id: 'u2', email: 'staff_b01@erp.local', name: 'Staff User', role: 'STORE_STAFF', storeId: 'b01' };
 
 async function createController(findUnique = vi.fn()) {
   const moduleRef = await Test.createTestingModule({
@@ -53,6 +54,17 @@ describe('AuthController', () => {
     expect(name).toBe(SESSION_COOKIE);
     expect(verifySessionToken(token, secret)).toBe('u1');
     expect(options).toMatchObject({ httpOnly: true, sameSite: 'lax' });
+  });
+
+  it('signs in as STORE_STAFF with storeId', async () => {
+    const controller = await createController(
+      vi.fn().mockResolvedValue({ ...staff, passwordHash }),
+    );
+    const res = fakeResponse();
+
+    await expect(
+      call(controller.login(res), { email: 'staff_b01@erp.local', password: 'password' }),
+    ).resolves.toEqual(staff);
   });
 
   it('rejects a wrong password without setting a cookie', async () => {
